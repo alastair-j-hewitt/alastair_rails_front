@@ -36,3 +36,12 @@
 /yarn-error.log
 yarn-debug.log*
 .yarn-integrity
+
+# Never commit SSH keys or npm lockfiles (this app uses Yarn)
+rails-frontend
+rails-frontend.pub
+*.pem
+id_rsa*
+id_ed25519*
+package-lock.json
+.DS_Store
