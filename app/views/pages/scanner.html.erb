@@ -1,38 +1,46 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Instascan</title>
-    <script type="text/javascript" src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js" ></script>
-    <link rel="stylesheet" type="text/css" href="/stylesheets/estilo.css"/>
-  </head>
-  <body>
-  	<h1>home#scanner</h1>
-  	<p>find me in app/views/home/scanners.html.erb</p>
+<h1>Scan the QR code</h1>
+<video id="preview" playsinline></video>
+<p id="scanner-error" hidden></p>
+<p><%= link_to "Cancel", home_path %></p>
 
-    <video id="preview"></video>
-    <script>
-        let scanner = new Instascan.Scanner(
-            {
-                video: document.getElementById('preview')
-            }
-        );
-        scanner.addListener('scan', function(content) {
-        	window.location.href = 'confirmation';
-            //alert('Escaneou o conteudo: ' + content);
-            // window.open(content, "_blank");
+<%# Instascan is served locally (public/js) because rawgit.com no longer exists. %>
+<script src="/js/instascan.min.js"></script>
+<script>
+  (function () {
+    var errorBox = document.getElementById("scanner-error");
 
-            document.write('Escaneou o conteudo: ' + content);
-            
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.hidden = false;
+    }
+
+    if (typeof Instascan === "undefined") {
+      showError("The QR scanner library failed to load.");
+      return;
+    }
+
+    var scanner = new Instascan.Scanner({ video: document.getElementById("preview") });
+
+    scanner.addListener("scan", function (content) {
+      // Store first, then navigate. Never write scanned content into the page as HTML.
+      sessionStorage.setItem("cont", content);
+      scanner.stop();
+      window.location.assign("<%= confirmation_path %>");
+    });
+
+    Instascan.Camera.getCameras()
+      .then(function (cameras) {
+        if (cameras.length === 0) {
+          showError("No camera found on this device.");
+          return;
+        }
+        var rear = cameras.find(function (camera) {
+          return /back|rear|environment/i.test(camera.name || "");
         });
-        Instascan.Camera.getCameras().then(cameras => 
-        {
-            if(cameras.length > 0){
-                scanner.start(cameras[0]);
-            } else {
-                console.error("Não existe câmera no dispositivo!");
-            }
-        });
-    </script>
-
- </body>
-</html>
+        scanner.start(rear || cameras[0]);
+      })
+      .catch(function (err) {
+        showError("Camera unavailable. Phones require HTTPS for camera access. (" + err.message + ")");
+      });
+  })();
+</script>

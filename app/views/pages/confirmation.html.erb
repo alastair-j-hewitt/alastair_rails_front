@@ -1,16 +1,17 @@
-<h1>Home#confirmation</h1>
-<p>Your total is: Validated Amount From Scan.  Confirm purchase?</p>
-<button type="button" class="btn btn-primary" id="primary">Sim</button>
-<button type="button" class="btn btn-danger">Não</button>
+<div class="row">
+  <div class="col-sm-4 offset-sm-4">
+    <h1>Confirm purchase</h1>
+    <p>Scanned code: <strong id="scanned-code"></strong></p>
+    <p>Confirm purchase?</p>
+    <%= link_to "Sim", pin_path, class: "btn btn-primary" %>
+    <%= link_to "Não", home_path, class: "btn btn-danger" %>
+  </div>
+</div>
 
-
-<script type="text/javascript">
-	const button = document.getElementById('primary');
-
-	button.addEventListener('click', event => {
-		window.location.href = "pin";
-});
+<script>
+  (function () {
+    // textContent treats the scanned value as plain text, so a malicious QR code cannot inject markup.
+    var code = sessionStorage.getItem("cont");
+    document.getElementById("scanned-code").textContent = code || "(nothing scanned)";
+  })();
 </script>
-<p>Find me in app/views/home/confirmation.html.erb</p>
-<!-- 
-<h2><%= @page %></h2> -->

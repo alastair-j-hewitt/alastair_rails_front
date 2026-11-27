@@ -1,15 +1,10 @@
 Rails.application.routes.draw do
-  resources :articles
-  get 'home', to: 'pages#home', as: :home
-  get 'scanner', to: 'pages#scanner', as: :scanner
-  get 'confirmation', to: 'pages#confirmation', as: :confirmation
-  get 'pin', to: 'pages#pin', as: :pin
-  get 'summary', to: 'pages#summary', as: :summary
-  # get "pages/:id", to: "pages#show"
-
-  root to: 'pages#home'
-
-  #root to: 'articles#index'
-  resources :pages, except: :index
+  # Scan-to-pay demo flow: home -> scanner -> confirmation -> pin -> summary
+  root to: "pages#home"
+  get "home", to: "pages#home", as: :home
+  get "scanner", to: "pages#scanner", as: :scanner
+  get "confirmation", to: "pages#confirmation", as: :confirmation
+  get "pin", to: "pages#pin", as: :pin
+  post "summary", to: "pages#summary", as: :summary
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
